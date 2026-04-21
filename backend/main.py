@@ -10,6 +10,8 @@ import numpy as np
 from groq import Groq
 from dotenv import load_dotenv
 
+from paddleocr import PaddleOCR
+
 load_dotenv(dotenv_path="../.env", override=True)
 app = FastAPI(title="DocRetrieve AI Backend")
 
@@ -26,6 +28,7 @@ UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 model = SentenceTransformer('all-MiniLM-L6-v2')
+ocr = PaddleOCR(use_angle_cls=True, lang='en')
 vector_store = []
 
 
@@ -37,7 +40,7 @@ groq_client = Groq(api_key=GROQ_API_KEY)
 
 @app.get("/")
 def read_root():
-    return {"message": "Full RAG with Groq is ready! 🚀"}
+    return {"message": "Full RAG with Groq and PaddleOCR is ready! 🚀"}
 
 @app.post("/upload")
 async def upload_documents(files: List[UploadFile] = File(...)):
@@ -56,6 +59,17 @@ async def upload_documents(files: List[UploadFile] = File(...)):
                 extracted_text += page.get_text()
             doc.close()
 
+
+        if len(extracted_text.strip())<100:
+            try: 
+                result = ocr.ocr(file_path, cls=True) 
+                for line in result: 
+                    for word in line : 
+                        extracted_text += word[1][0] +"\n"
+            except Exception as e:
+                extracted_text += f"\nOCR Error: {str(e)}"
+                print(f"OCR failed for {file.filename}: {str(e)}")
+            
         # Better chunking
         lines = [line.strip() for line in extracted_text.split('\n') if line.strip()]
         chunks = []
