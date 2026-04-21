@@ -5,3 +5,14 @@ pymupdf
 sentence-transformers
 numpy
 groq
+
+
+fastapi
+uvicorn
+python-multipart
+pymupdf
+sentence-transformers
+numpy
+groq
+paddleocr
+paddlepaddle
