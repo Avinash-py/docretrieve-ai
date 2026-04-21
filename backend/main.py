@@ -8,7 +8,9 @@ import fitz
 from sentence_transformers import SentenceTransformer
 import numpy as np
 from groq import Groq
+from dotenv import load_dotenv
 
+load_dotenv(dotenv_path="../.env", override=True)
 app = FastAPI(title="DocRetrieve AI Backend")
 
 app.add_middleware(
@@ -26,9 +28,6 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 model = SentenceTransformer('all-MiniLM-L6-v2')
 vector_store = []
 
-# === CHANGE THIS WITH YOUR KEY ===
-# GROQ_API_KEY = "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"   # ← Paste your Groq key here
-# groq_client = Groq(api_key=GROQ_API_KEY)
 
 import os
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
